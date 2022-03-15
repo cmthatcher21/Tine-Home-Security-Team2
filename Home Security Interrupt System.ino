@@ -10,10 +10,10 @@
 
 #include "Firebase_Arduino_WiFiNINA.h"
 
-#define FIREBASE_HOST "home-security-2-default-rtdb.firebaseio.com"
-#define FIREBASE_AUTH "AFC5lTirxWtocGHXPbqBQGArTchhBckmuJUSLSa6"
-#define WIFI_SSID "RPI"
-#define WIFI_PASSWORD "Th7nd3rL@b"
+#define FIREBASE_HOST ""
+#define FIREBASE_AUTH ""
+#define WIFI_SSID ""
+#define WIFI_PASSWORD ""
 
 volatile bool magtriggered = 0;
 
