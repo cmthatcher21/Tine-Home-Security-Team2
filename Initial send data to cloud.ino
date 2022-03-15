@@ -4,16 +4,14 @@
 #include <WiFiNINA.h>
 
 #include "arduino_secrets.h" 
-//Ejemplo para acceder a Firebase
 
-//Necesaria tener instalado WiFiNINA Library https://github.com/arduino-libraries/WiFiNINA esta en el repositorio de Arduino
 
 #include "Firebase_Arduino_WiFiNINA.h"
 
-#define FIREBASE_HOST "home-security-project-21ee6-default-rtdb.firebaseio.com"
-#define FIREBASE_AUTH "Inz3S5wczaXuRbcFVvQWF8FYmEZIglAW14slDwm7"
-#define WIFI_SSID "RPI"
-#define WIFI_PASSWORD "Th7nd3rL@b"
+#define FIREBASE_HOST ""
+#define FIREBASE_AUTH ""
+#define WIFI_SSID ""
+#define WIFI_PASSWORD ""
 
 char ssid[] = SECRET_SSID;        
 char pass[] = SECRET_PASS;
