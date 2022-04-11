@@ -8,6 +8,8 @@ connections, like client.connect(host, port).
 Written by Arturo Guadalupi
 last revision November 2015
 
+Additions and modifications by Cory Thatcher
+
 */
 
 #include <SPI.h>
