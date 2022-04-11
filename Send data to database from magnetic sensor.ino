@@ -1,18 +1,23 @@
+// Code modified and written by Cory Thatcher, Ethan Long, Coby Moon
+// Code adopted from Electro Peak on arduino project hub. Project: Connecting Arduino to Firebase to Send & Receive Data
+
+
 #include <SPI.h>
 #include <WiFiNINA.h>
+#include <WiFiClient.h>
 #include <ArduinoLowPower.h>
 
 #include "arduino_secrets.h" 
-//Ejemplo para acceder a Firebase
-
-//Necesaria tener instalado WiFiNINA Library https://github.com/arduino-libraries/WiFiNINA esta en el repositorio de Arduino
 
 #include "Firebase_Arduino_WiFiNINA.h"
 
-#define FIREBASE_HOST "home-security-project-21ee6-default-rtdb.firebaseio.com"
-#define FIREBASE_AUTH "Inz3S5wczaXuRbcFVvQWF8FYmEZIglAW14slDwm7"
+#define FIREBASE_HOST "home-security-2-default-rtdb.firebaseio.com"
+#define FIREBASE_AUTH "AFC5lTirxWtocGHXPbqBQGArTchhBckmuJUSLSa6"
 #define WIFI_SSID "RPI"
 #define WIFI_PASSWORD "Th7nd3rL@b"
+
+volatile bool magtriggered = 0;
+
 
 char ssid[] = SECRET_SSID;        
 char pass[] = SECRET_PASS;
@@ -20,9 +25,15 @@ int status = WL_IDLE_STATUS;
 
 //Define Firebase data object
 FirebaseData firebaseData;
-
+ int Arduino_state = 0;
+  
 void setup()
 {
+  ConfigInterrupt(0);
+  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(A0, INPUT);
+  ConfigInterrupt(0);
+
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
   while (!Serial);
@@ -51,47 +62,63 @@ void setup()
 }
 
 
-void loop()
-{
+void loop() {
 
-       // read the input on analog pin 0:
-  int sensorValue = analogRead(A0);
-   // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
-  float voltage = sensorValue * (5.0 / 1023.0);
-// print out the value you read: remove in final
-  String path = "/test"; //Path in the Database. We can hang by the root
-  String jsonStr;
-  if (voltage != 5.00)
-  {
-      if (Firebase.setInt(firebaseData, path + "/Int/Data1",0))
+  
+
+  LowPower.sleep(30000); //300,000 = 5 mins
+  if(Arduino_state == 0){
+    magtriggered = 0;
+    Arduino_state = ReadWrite(magtriggered);
+    if(Arduino_state == 1){
+      ConfigInterrupt(1);
+    }
+  }
+  else if(Arduino_state == 1){
+    Arduino_state = ReadWrite(magtriggered);
+    //if(magtriggered == 1){ // THIS IS FOR POWER SAVE STUFF
+    //  Arduino_state = 0;
+    //}
+    if(Arduino_state == 0){
+      ConfigInterrupt(0);
+    }
+    magtriggered = 0;
+  }
+
+ 
+
+
+}
+int ReadWrite(int Trig)
+{
+  int x = 0;
+   if (Firebase.setInt(firebaseData, "/ArduinoCheckIn1",1))
+     {
+     Serial.println("Insert");
+     Serial.println("PATH: " + firebaseData.dataPath());
+     Serial.println("TYPE: " + firebaseData.dataType());      
+     Serial.print("VALUE: ");
+     Serial.println(firebaseData.intData());
+     }
+    if(Trig == 1)
+    {
+      if (Firebase.setInt(firebaseData, "/ArduinoTriggered1",Trig))
       {
       Serial.println("Insert");
       Serial.println("PATH: " + firebaseData.dataPath());
-      Serial.println("TYPE: " + firebaseData.dataType());
+      Serial.println("TYPE: " + firebaseData.dataType());      
       Serial.print("VALUE: ");
       Serial.println(firebaseData.intData());
-      
       }
-      
-  }
-  else if (voltage == 5.00)
+    }
+  if(Firebase.getInt(firebaseData, "/Armed"))
   {
-    digitalWrite(LED_BUILTIN, LOW);
-    if (Firebase.setInt(firebaseData, path + "/Int/Data1",1))
-    {
-      Serial.println("Insert");
-      Serial.println("PATH: " + firebaseData.dataPath());
-      Serial.println("TYPE: " + firebaseData.dataType());
-      Serial.print("VALUE: "); 
-      Serial.println(firebaseData.intData());   
-                   
+    if(firebaseData.dataType() == "int")
+    x = firebaseData.intData();
+    
   }
- 
-  
+  return x;
 }
-
-}
-
 void printData() {
   Serial.println("Board Information:");
   // print your board's IP address:
@@ -115,3 +142,18 @@ void printData() {
   Serial.println();
 }
 
+void ISR()
+{
+  magtriggered = 1;
+}
+
+void ConfigInterrupt(int x){
+  if(x==0){
+    pinMode(A1, OUTPUT);
+  }
+  else{
+    //pinMode(A1, INPUT);
+    LowPower.attachInterruptWakeup(A1, ISR, RISING);
+  }
+  return;
+}
