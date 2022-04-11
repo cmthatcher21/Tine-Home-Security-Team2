@@ -1,3 +1,6 @@
+//Code adopted from Karl Söder on Connecting MKR WiFi 1010 to a Wi-Fi Network Fourm.
+//Modifications and changes made by Cory Thatcher
+
 #include <SPI.h>
 #include <WiFiNINA.h>
 #include "arduino_secrets.h"
