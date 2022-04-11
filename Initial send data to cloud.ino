@@ -1,4 +1,5 @@
-
+// Code modified and changed from Electro Peak on arduino Project Hub. Published on April 18th 2019.
+// Modifications and changes made by Cory Thatcher
 
 #include <SPI.h>
 #include <WiFiNINA.h>
